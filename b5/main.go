@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path"
 )
 
 type M map[string]interface{}
 
 func main() {
-	var tmpl, err = template.ParseGlob("b5/views/*")
-	if err != nil {
-		panic(err.Error())
-		return
-	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var data = M{"name": "Batman"}
-		err = tmpl.ExecuteTemplate(w, "index", data)
+		
+		var tmpl = template.Must(template.ParseFiles(
+			path.Join("b5","views","index.html"),
+			path.Join("b5","views","_header.html"),
+			path.Join("b5","views","_message.html"),
+		))
+		var err = tmpl.ExecuteTemplate(w, "index", data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -25,7 +26,13 @@ func main() {
 
 	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		var data = M{"name": "Batman"}
-		err = tmpl.ExecuteTemplate(w, "about", data)
+		var tmpl = template.Must(template.ParseFiles(
+			path.Join("b5","views","about.html"),
+			path.Join("b5","views","_header.html"),
+			path.Join("b5","views","_message.html"),
+		))
+
+		var err = tmpl.ExecuteTemplate(w, "about", data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
